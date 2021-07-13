@@ -223,8 +223,268 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
 <div class="container">
   <div class="row">
     <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-      <p><img src="./static/img/storm-use.png" /></p>
+      <figure>
+<img src="./static/img/storm-use.png" alt /><figcaption>STORM</figcaption>
+</figure>
+<hr>
 <p>Here is a short demo that shows how to build web-apps with STORM.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>STORM has two dependencies: the Haskell build tool <code>stack</code> and the SMT solver <code>z3</code>.</p>
+<ol type="1">
+<li><p><a href="https://docs.haskellstack.org/en/stable/README/">stack v2.5.1</a> Follow <a href="https://docs.haskellstack.org/en/stable/README/#how-to-install">these instructions</a> to install <code>stack</code>.</p></li>
+<li><p><a href="https://github.com/Z3Prover/z3">z3 v4.8.8</a> A copy of the precompiled <code>z3</code> binary <a href="https://github.com/Z3Prover/z3/releases/tag/z3-4.8.8">available here</a> needs to be in the path. You can ignore the shared libraries and bindings for Java and Python; just download and place a suitable <code>z3</code> binary somewhere in your <code>$PATH</code>.</p></li>
+</ol>
+<p>Additionally we will use <a href="https://curl.se/"><code>curl</code></a> to test our app as we go.</p>
+<h2 id="install">Install</h2>
+<p>The easiest way to get started is to download the starter <em>template</em> app</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>$ <span class="fu">git</span> clone git@github.com:storm-framework/demo.git storm-app</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>$ <span class="bu">cd</span> storm-app</span></code></pre></div>
+<h2 id="architecture">Architecture</h2>
+<p>A STORM app has the following essential components.</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>File</strong></th>
+<th style="text-align: left;"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><a href="src/Model.storm"><code>Models.storm</code></a></td>
+<td style="text-align: left;">(refined) model-policy file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="src/Routes.hs"><code>Routes.hs</code></a></td>
+<td style="text-align: left;">route-controller mapping</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="src/Types.hs"><code>Types.hs</code></a></td>
+<td style="text-align: left;">global type definitions</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="src/Config.hs"><code>Config.hs</code></a></td>
+<td style="text-align: left;">configuration options (e.g. env variables)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="src/Controllers/"><code>Controllers/</code></a></td>
+<td style="text-align: left;">controller implementations</td>
+</tr>
+</tbody>
+</table>
+<h2 id="build">Build</h2>
+<p>You can build the web-app by typing</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>$ <span class="fu">make</span> build</span></code></pre></div>
+<p>This will take a <em>long while</em> to download all the dependencies, including building the LiquidHaskell verifier. Grab some coffee, like some tweets, brush your teeth, etc. Fortunately, you only need to do this once; subsequent <code>make</code> should be quick.</p>
+<h2 id="version-0-kick-the-tires">Version 0: Kick the Tires</h2>
+<p>Lets kick the tires to make sure stuff is working.</p>
+<p><strong>Step 1.</strong> Start up the server by</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="fu">make</span></span></code></pre></div>
+<p>You should see the following at your terminal</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">Starting</span> server at: host = <span class="st">&quot;127.0.0.1&quot;</span>, port = 3000</span></code></pre></div>
+<p><strong>Step 2.</strong> Test with <code>curl</code></p>
+<p>In a <em>separate</em> terminal test your server with <code>curl</code></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>$ <span class="ex">curl</span> http://localhost:3000/api/ping</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="st">&quot;pong&quot;</span></span></code></pre></div>
+<h2 id="version-1-routes-and-controllers">Version 1: Routes and controllers</h2>
+<p>(You can “cheat” by switching to the branch <code>v1</code> in the repo.)</p>
+<p>Next, lets add our first route and its controller.</p>
+<p><strong>Step 1:</strong> Add a route <code>/list/:id</code></p>
+<p>Edit <code>src/Routes.hs</code> so that the definition of <code>routes</code> looks like</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ot">routes ::</span> [<span class="dt">Route</span>]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>routes <span class="ot">=</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>  [ post <span class="st">&quot;/api/signin&quot;</span>    signIn</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>  , post <span class="st">&quot;/api/signout&quot;</span>   signOut</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>  , get  <span class="st">&quot;/api/ping&quot;</span>      pong</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>  , get  <span class="st">&quot;/api/list/:uid&quot;</span> list     <span class="co">-- add this line</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>  ]</span></code></pre></div>
+<p><strong>Step 2:</strong> Create a <code>list</code> controller</p>
+<p>Edit <code>src/Controllers/List.hs</code> to add the following definition that simply responds with a string repeating the <code>UserId</code> and the current time.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co">{-@ list :: UserId -&gt; TaggedT&lt;{\_ -&gt; False}, {\_ -&gt; True}&gt; _ _ _ @-}</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="ot">list ::</span> <span class="dt">UserId</span> <span class="ot">-&gt;</span> <span class="dt">Controller</span> ()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>list uid <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>  time   <span class="ot">&lt;-</span> getTime</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>  respondJSON status200 (<span class="st">&quot;OK: hello &quot;</span> <span class="op">&lt;&gt;</span> tShow uid <span class="op">&lt;&gt;</span> <span class="st">&quot; at &quot;</span> <span class="op">&lt;&gt;</span><span class="ot"> time ::</span> <span class="dt">T.Text</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a><span class="ot">getTime ::</span> <span class="dt">Controller</span> <span class="dt">T.Text</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>getTime <span class="ot">=</span> tShow <span class="op">&lt;$&gt;</span> liftTIO currentTime</span></code></pre></div>
+<p><strong>Step 3:</strong> Test</p>
+<p>Run <code>scripts/test_1.sh</code> to test your new route and controller!</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>$ <span class="ex">./scripts/test_1.sh</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="ex">list</span> ... returns current time UTC</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="st">&quot;OK: hello SqlBackendKey {unSqlBackendKey = 1} at 2021-07-13 22:53:25.51654 UTC&quot;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a><span class="ex">list</span> ... returns current time UTC</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a><span class="st">&quot;OK: hello SqlBackendKey {unSqlBackendKey = 2} at 2021-07-13 22:53:25.5285 UTC&quot;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a><span class="ex">list</span> ... returns current time UTC</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a><span class="st">&quot;OK: hello SqlBackendKey {unSqlBackendKey = 3} at 2021-07-13 22:53:25.537898 UTC&quot;</span>⏎</span></code></pre></div>
+<h2 id="version-2-adding-authentication">Version 2: Adding Authentication</h2>
+<p>Lets look at the model-policy file <code>src/Models.storm</code></p>
+<p>The <code>User</code> table defines the set of users of the app.</p>
+<pre><code>User
+  emailAddress  Text
+  password      ByteString
+  firstName     Text
+  lastName      Text
+  UniqueEmailAddress emailAddress</code></pre>
+<p><strong>Step 1:</strong> Require authentication</p>
+<p>Lets modify the <code>list</code> controller (in <code>src/Controllers/List.hs</code>) to use <code>requireAuthUser</code> which succeeds only when the request is from a logged in user.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="co">{-@ list :: UserId -&gt; TaggedT&lt;{\_ -&gt; False}, {\_ -&gt; True}&gt; _ _ _ @-}</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="ot">list ::</span> <span class="dt">UserId</span> <span class="ot">-&gt;</span> <span class="dt">Controller</span> ()</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>list uid <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>  requireAuthUser</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>  time   <span class="ot">&lt;-</span> getTime</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>  user   <span class="ot">&lt;-</span> selectFirstOr notFoundJSON (userId' <span class="op">==.</span> uid)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>  userNG <span class="ot">&lt;-</span> extractUserNG user</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>  respondJSON status200 (<span class="st">&quot;OK: hello &quot;</span> <span class="op">&lt;&gt;</span> tShow userNG <span class="op">&lt;&gt;</span> <span class="st">&quot; at &quot;</span> <span class="op">&lt;&gt;</span><span class="ot"> time ::</span> <span class="dt">T.Text</span>)</span></code></pre></div>
+<p>Additionally, notice that</p>
+<ol type="1">
+<li><p>We use the query <code>selectFirstOr</code> with the query <code>(userId' ==. uid)</code> to find the first record in the <code>User</code> table whose primary key equals <code>uid</code> – i.e. to find the record for <code>uid</code> if it exists or else, respond with <code>Not Found</code>.</p></li>
+<li><p>We use <code>extractUserNG</code>, which internally, uses <code>project</code> to pull out the values of individual field of the <code>user</code> record to build the pure value <code>userNG</code> sent back to the client.</p></li>
+</ol>
+<p><strong>Step 3:</strong> Test</p>
+<p>Run <code>make</code> to build and run the server in one terminal.</p>
+<p>In another test your updated controller with <code>scripts/test_2.sh</code>.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="ex">add</span> users</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="ex">2021-07-13</span> 16:09:47.392235 PDT INFO: addUser: CreateUser {crUserEmail = <span class="st">&quot;alice@st.orm&quot;</span>, crUserPassword = <span class="st">&quot;alice&quot;</span>, crUserFirst = <span class="st">&quot;Alice&quot;</span>, crUserLast = <span class="st">&quot;Waters&quot;</span>}</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="ex">2021-07-13</span> 16:09:47.429127 PDT INFO: addUser: adding new user CreateUser {crUserEmail = <span class="st">&quot;alice@st.orm&quot;</span>, crUserPassword = <span class="st">&quot;alice&quot;</span>, crUserFirst = <span class="st">&quot;Alice&quot;</span>, crUserLast = <span class="st">&quot;Waters&quot;</span>}</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a><span class="ex">Add</span> User: Just (SqlBackendKey {unSqlBackendKey = 1})</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a><span class="ex">2021-07-13</span> 16:09:48.034154 PDT INFO: addUser: CreateUser {crUserEmail = <span class="st">&quot;bob@st.orm&quot;</span>, crUserPassword = <span class="st">&quot;bob&quot;</span>, crUserFirst = <span class="st">&quot;Robert&quot;</span>, crUserLast = <span class="st">&quot;Barron&quot;</span>}</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a><span class="ex">2021-07-13</span> 16:09:48.072295 PDT INFO: addUser: adding new user CreateUser {crUserEmail = <span class="st">&quot;bob@st.orm&quot;</span>, crUserPassword = <span class="st">&quot;bob&quot;</span>, crUserFirst = <span class="st">&quot;Robert&quot;</span>, crUserLast = <span class="st">&quot;Barron&quot;</span>}</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true"></a><span class="ex">Add</span> User: Just (SqlBackendKey {unSqlBackendKey = 2})</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true"></a><span class="ex">2021-07-13</span> 16:09:48.682439 PDT INFO: addUser: CreateUser {crUserEmail = <span class="st">&quot;carlos@st.orm&quot;</span>, crUserPassword = <span class="st">&quot;carlos&quot;</span>, crUserFirst = <span class="st">&quot;Carlos&quot;</span>, crUserLast = <span class="st">&quot;Cortado&quot;</span>}</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true"></a><span class="ex">2021-07-13</span> 16:09:48.720655 PDT INFO: addUser: adding new user CreateUser {crUserEmail = <span class="st">&quot;carlos@st.orm&quot;</span>, crUserPassword = <span class="st">&quot;carlos&quot;</span>, crUserFirst = <span class="st">&quot;Carlos&quot;</span>, crUserLast = <span class="st">&quot;Cortado&quot;</span>}</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true"></a><span class="ex">Add</span> User: Just (SqlBackendKey {unSqlBackendKey = 3})</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true"></a><span class="ex">list</span> ... returns nothing</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true"></a><span class="ex">sign-in</span> first!</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true"></a><span class="dt">{&quot;firstName&quot;:&quot;Alice&quot;,&quot;lastName&quot;:&quot;Waters&quot;}</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true"></a><span class="ex">list</span> ... now succeeds</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true"></a><span class="st">&quot;OK: hello UserNG {userFirstName = </span><span class="dt">\&quot;</span><span class="st">Alice</span><span class="dt">\&quot;</span><span class="st">, userLastName = </span><span class="dt">\&quot;</span><span class="st">Waters</span><span class="dt">\&quot;</span><span class="st">} at 2021-07-13 23:09:48.796563 UTC&quot;</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true"></a><span class="ex">list</span> ... now succeeds</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true"></a><span class="st">&quot;OK: hello UserNG {userFirstName = </span><span class="dt">\&quot;</span><span class="st">Robert</span><span class="dt">\&quot;</span><span class="st">, userLastName = </span><span class="dt">\&quot;</span><span class="st">Barron</span><span class="dt">\&quot;</span><span class="st">} at 2021-07-13 23:09:48.806359 UTC&quot;</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true"></a><span class="ex">list</span> ... returns {} <span class="fu">as</span> no such user</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true"></a>{}⏎</span></code></pre></div>
+<p>Note that we don’t get any response until we’re signed in.</p>
+<h2 id="version-3-adding-items">Version 3: Adding Items</h2>
+<p>Next, lets start populating our users’ lists with some items!</p>
+<p><strong>Step 1:</strong> Add an <code>Item</code> table</p>
+<p>First, lets make an <code>Item</code> table by editing <code>src/Models.storm</code> to include</p>
+<pre><code>Item
+  owner         UserId
+  description   Text
+  level         String</code></pre>
+<p>Similarly, we want a JSON-compatible pure representation of <code>Item</code> so edit <code>src/Types.hs</code> to</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">ItemData</span> <span class="ot">=</span> <span class="dt">ItemData</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a>  {<span class="ot"> itemDescription ::</span> <span class="dt">Text</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a>  ,<span class="ot"> itemLevel       ::</span> <span class="dt">String</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a>  }</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a>  <span class="kw">deriving</span> (<span class="dt">Show</span>, <span class="dt">Generic</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true"></a><span class="ot">mkItemData ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">ItemData</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true"></a>mkItemData descr levl <span class="ot">=</span> <span class="dt">ItemData</span> (strip descr) (sStrip levl)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">FromJSON</span> <span class="dt">ItemData</span> <span class="kw">where</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true"></a>  parseJSON <span class="ot">=</span> genericParseJSON (stripPrefix <span class="st">&quot;item&quot;</span>)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">ToJSON</span> <span class="dt">ItemData</span> <span class="kw">where</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true"></a>  toEncoding <span class="ot">=</span> genericToEncoding (stripPrefix <span class="st">&quot;item&quot;</span>)</span></code></pre></div>
+<p><strong>Step 2:</strong> Create an <code>add</code> route and controller</p>
+<p>Next, lets make a new API endpoint to insert items for a user</p>
+<p>Edit <code>src/Routes.hs</code> to include</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="ot">routes ::</span> [<span class="dt">Route</span>]</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a>routes <span class="ot">=</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a>  [ post <span class="st">&quot;/api/signin&quot;</span>    signIn</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a>  , post <span class="st">&quot;/api/signout&quot;</span>   signOut</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true"></a>  , get  <span class="st">&quot;/api/ping&quot;</span>      pong</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true"></a>  , get  <span class="st">&quot;/api/list/:uid&quot;</span> list</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true"></a>  , get  <span class="st">&quot;/api/add&quot;</span>       add</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true"></a>  ]</span></code></pre></div>
+<p>Edit <code>src/Controllers/List.hs</code> to include the controller</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="co">{-@ add :: TaggedT&lt;{\_ -&gt; True}, {\_ -&gt; True}&gt; _ _ _ @-}</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a><span class="ot">add ::</span> <span class="dt">Controller</span> ()</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a>add <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a>  owner   <span class="ot">&lt;-</span> requireAuthUser</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a>  ownerId <span class="ot">&lt;-</span> project userId' owner</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a>  ownerEmail <span class="ot">&lt;-</span> project userEmailAddress' owner</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a>  items   <span class="ot">&lt;-</span> decodeBody</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true"></a>  mapT (\<span class="dt">ItemData</span> {<span class="op">..</span>} <span class="ot">-&gt;</span> insert (mkItem ownerId itemDescription itemLevel)) items</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true"></a>  respondJSON status200 (<span class="st">&quot;OK: added &quot;</span> <span class="op">&lt;&gt;</span> tShow (<span class="fu">length</span> items) <span class="op">&lt;&gt;</span> <span class="st">&quot; items for &quot;</span> <span class="op">&lt;&gt;</span> ownerEmail)</span></code></pre></div>
+<p>Note how the controller</p>
+<ol type="1">
+<li>Finds the <code>ownerId</code> and <code>ownerEmail</code> using <code>requireAuthUser</code> and <code>project</code></li>
+<li>Extracts the JSON payload via <code>decodeBody</code></li>
+<li>Uses <code>mkItem</code> to create the <code>Item</code> records and</li>
+<li>Uses <code>insert</code> to add the records to the DB.</li>
+</ol>
+<p><strong>Step 3:</strong> Modify <code>list</code> to return items</p>
+<p>Next, lets update <code>list</code> to return the items of the given <code>UserId</code> (instead of just responding with their names…). Edit the <code>src/Controllers/List.hs</code> so that</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a>list userId <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a>  items     <span class="ot">&lt;-</span> selectList (itemOwner' <span class="op">==.</span> userId)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a>  itemDatas <span class="ot">&lt;-</span> mapT (\i <span class="ot">-&gt;</span> <span class="dt">ItemData</span> <span class="ot">`fmap`</span> project itemDescription' i</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a>                                    <span class="op">&lt;*&gt;</span>    project itemLevel' i)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a>                    items</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a>  respondJSON status200 itemDatas</span></code></pre></div>
+<p>Now, notice that first <code>selectList</code> is invoked with a query asking for all the <code>Item</code>s whose <code>owner</code> is <code>userId</code>. Next, we build a response object by <code>project</code>ing the <code>description</code> and <code>level</code> values of each record in <code>items</code> to build an array of JSON objects that is sent back to the client.</p>
+<p><strong>Step 4:</strong> Test</p>
+<p>Run <code>make</code> and then lets ensure <code>add</code> works properly by creating a JSON file with items for <code>alice</code></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a>$ <span class="fu">cat</span> <span class="op">&gt;</span> scripts/items_alice.json</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a><span class="bu">[</span> <span class="dt">{&quot;description&quot;:&quot;katla&quot;,&quot;level&quot;:&quot;public&quot;}</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a>, <span class="dt">{&quot;description&quot;:&quot;counterpart&quot;,&quot;level&quot;:&quot;public&quot;}</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a>, {<span class="st">&quot;description&quot;</span>:<span class="st">&quot;marley and me&quot;</span>,<span class="st">&quot;level&quot;</span>:<span class="st">&quot;private&quot;</span>}</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true"></a>, {<span class="st">&quot;description&quot;</span>:<span class="st">&quot;daniel tiger&quot;</span>,<span class="st">&quot;level&quot;</span>:<span class="st">&quot;follower&quot;</span>}</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true"></a>, <span class="dt">{&quot;description&quot;:&quot;lupin&quot;,&quot;level&quot;:&quot;follower&quot;}</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true"></a><span class="bu">]</span></span></code></pre></div>
+<p>and then adding and querying the server for those items</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="ex">rjhala@khao-soi</span> ~/r/storm-demo (v3) [<span class="ex">SIGINT</span>]<span class="op">&gt;</span> ./scripts/test_3.sh</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a><span class="ex">*********</span> add users</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true"></a><span class="ex">********</span> sign-in alice!</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true"></a><span class="dt">{&quot;firstName&quot;:&quot;Alice&quot;,&quot;lastName&quot;:&quot;Waters&quot;}</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true"></a><span class="ex">********</span> add items for alice</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true"></a><span class="st">&quot;OK: added 5 items for alice@st.orm&quot;</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true"></a><span class="ex">*******</span> logout</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true"></a><span class="ex">********</span> sign-in alice!</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true"></a><span class="dt">{&quot;firstName&quot;:&quot;Alice&quot;,&quot;lastName&quot;:&quot;Waters&quot;}</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true"></a><span class="ex">********</span> list items for alice ...</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true"></a>[<span class="dt">{&quot;description&quot;:&quot;katla&quot;,&quot;level&quot;:&quot;public&quot;}</span>,<span class="dt">{&quot;description&quot;:&quot;counterpart&quot;,&quot;level&quot;:&quot;public&quot;}</span>,{<span class="st">&quot;description&quot;</span>:<span class="st">&quot;marley and me&quot;</span>,<span class="st">&quot;level&quot;</span>:<span class="st">&quot;private&quot;</span>},{<span class="st">&quot;description&quot;</span>:<span class="st">&quot;daniel tiger&quot;</span>,<span class="st">&quot;level&quot;</span>:<span class="st">&quot;follower&quot;</span>},<span class="dt">{&quot;description&quot;:&quot;lupin&quot;,&quot;level&quot;:&quot;follower&quot;}</span>]</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true"></a><span class="ex">********</span> logout</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true"></a></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true"></a><span class="ex">********</span> sign-in bob!</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true"></a><span class="dt">{&quot;firstName&quot;:&quot;Robert&quot;,&quot;lastName&quot;:&quot;Barron&quot;}</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true"></a><span class="ex">********</span> list items for alice ...</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true"></a>[<span class="dt">{&quot;description&quot;:&quot;katla&quot;,&quot;level&quot;:&quot;public&quot;}</span>,<span class="dt">{&quot;description&quot;:&quot;counterpart&quot;,&quot;level&quot;:&quot;public&quot;}</span>,{<span class="st">&quot;description&quot;</span>:<span class="st">&quot;marley and me&quot;</span>,<span class="st">&quot;level&quot;</span>:<span class="st">&quot;private&quot;</span>},{<span class="st">&quot;description&quot;</span>:<span class="st">&quot;daniel tiger&quot;</span>,<span class="st">&quot;level&quot;</span>:<span class="st">&quot;follower&quot;</span>},<span class="dt">{&quot;description&quot;:&quot;lupin&quot;,&quot;level&quot;:&quot;follower&quot;}</span>]</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true"></a><span class="ex">********</span> logout</span></code></pre></div>
+<h2 id="version-4-restrict-to-public-items">Version 4: Restrict to Public Items</h2>
+<p>Oops, we hit a bit of a snag! It looks like <code>bob</code> (or anyone!) can see all of <code>alice</code>’s items, even the ones not marked <code>"public"</code>!</p>
+<ol type="1">
+<li>Modify: <code>models.storm</code> to specify <code>public</code> policy</li>
+<li>Make yields a build error!</li>
+<li>Fix the query</li>
+<li>Test <code>$ scripts/test_3.sh</code></li>
+</ol>
+<h3 id="error">Error</h3>
+<pre><code>**** LIQUID: UNSAFE ************************************************************
+...
+   |
+31 |   itemDatas &lt;- mapT (\i -&gt; ItemData &lt;$&gt; project itemDescription' i &lt;*&gt; project itemLevel' i) items
+   |                                                 ^^^^^^^^^^^^^^^^</code></pre>
+<h3 id="fix-the-query">Fix the query</h3>
+<pre><code>  viewerId  &lt;- project userId' =&lt;&lt; requireAuthUser
+  let pub    = if userId == viewerId then trueF else itemLevel' ==. &quot;public&quot; 
+  items     &lt;- selectList (itemOwner' ==. userId &amp;&amp;: pub)</code></pre>
+<h2 id="version-5-restrict-to-followers">Version 5 : Restrict to Followers</h2>
+<p>PROBLEM: want to share some items with <em>followers</em></p>
+<ol type="1">
+<li>Add the <code>Followers</code> table to <code>src/Models.storm</code></li>
+<li>Add the policy to <code>src/Models.storm</code></li>
+<li>Yikes, build error, fix it!</li>
+<li>Insert items to DB</li>
+<li>Test <code>$ scripts/test_5.sh</code></li>
+</ol>
     </div>
   </div>
 </div>
