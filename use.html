@@ -141,7 +141,7 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="https://cseweb.ucsd.edu/~npolikarpova/publications/osdi21.pdf" target="_blank">Paper</a></li>
+                <li><a href="https://ranjitjhala.github.io/static/storm-osdi21.pdf" target="_blank">Paper</a></li>
                 <li><a href="policies.html">Policies</a></li>
                 <li><a href="use.html">Use</a></li>
                 <li><a href="http://www.github.com/storm-framework/storm"><i class="fa fa-github"></i>Code</a></li>
@@ -180,7 +180,7 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
                             <h1 class="font-style-inline-small-h1">STORM Web Framework</h1>
                             <hr class="star-primary">
                             <p class="font-style-inline-small">
-                            <li><a href="https://cseweb.ucsd.edu/~npolikarpova/publications/osdi21.pdf" target="_blank">Paper</a></li>
+                            <li><a href="https://ranjitjhala.github.io/static/storm-osdi21.pdf" target="_blank">Paper</a></li>
                             <li><a href="policies.html">Policies</a></li>
                             <li><a href="use.html">Use</a></li>
                             <li><a href="http://www.github.com/storm-framework/storm"><i class="fa fa-github"></i>Code</a></li>
@@ -228,6 +228,7 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
 <hr>
 <p><br></p>
 <p>This tutorial/demo that shows how to build web-apps with STORM. Like STORM, the demo focuses only on the web-server <em>back-end</em>. You can use your favorite front-end framework to write the <em>client</em>. For examples, look at <a href="https://github.com/storm-framework/voltron">voltron</a> and <a href="https://github.com/storm-framework/disco">disco</a>, two complete applications we built with STORM and <a href="https://vuejs.org/">vue.js</a>.</p>
+<p>Here’s a video demonstrating <a href="https://www.youtube.com/watch?v=fP9Anp2v8_8">disco</a>.</p>
 <br>
 <hr>
 <p><br></p>
@@ -675,7 +676,7 @@ policy OwnFollowPub = \item viewer -&gt;
 <span id="cb29-9"><a href="#cb29-9" aria-hidden="true"></a>  <span class="kw">case</span> flws <span class="kw">of</span></span>
 <span id="cb29-10"><a href="#cb29-10" aria-hidden="true"></a>    [] <span class="ot">-&gt;</span> <span class="fu">return</span> <span class="dt">False</span></span>
 <span id="cb29-11"><a href="#cb29-11" aria-hidden="true"></a>    _  <span class="ot">-&gt;</span> <span class="fu">return</span> <span class="dt">True</span></span></code></pre></div>
-<p>The text inside <code>{-@ ... @-}</code> says that <code>checkFollower</code> is a <em>read-only</em> controller, that accesses data visible to <em>all</em> users (<code>True</code>) and sends data to <em>no</em> users (<code>False</code>). Furthermore, the output is a <code>Bool</code> which if <code>True</code> implies the <code>follows</code> relationship holds between the input <code>UserId</code>s. For more details on the signatures, see <a href="https://cseweb.ucsd.edu/~npolikarpova/publications/osdi21.pdf">the paper</a>.</p>
+<p>The text inside <code>{-@ ... @-}</code> says that <code>checkFollower</code> is a <em>read-only</em> controller, that accesses data visible to <em>all</em> users (<code>True</code>) and sends data to <em>no</em> users (<code>False</code>). Furthermore, the output is a <code>Bool</code> which if <code>True</code> implies the <code>follows</code> relationship holds between the input <code>UserId</code>s. For more details on the signatures, see <a href="https://ranjitjhala.github.io/static/storm-osdi21.pdf">the paper</a>.</p>
 <p>Next, update <code>list</code> in <code>src/Controllers/List.hs</code> to use a separate conjunct if the <code>viewer</code> is indeed a follower of <code>userId</code></p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true"></a><span class="co">{-@ list :: _ -&gt; TaggedT&lt;{\_ -&gt; False}, {\_ -&gt; True}&gt; _ _ _ @-}</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true"></a><span class="ot">list ::</span> <span class="dt">UserId</span> <span class="ot">-&gt;</span> <span class="dt">Controller</span> ()</span>
@@ -747,7 +748,7 @@ policy OwnFollowPub = \item viewer -&gt;
 <br>
 <hr>
 <p><br></p>
-<p>While the above should get you started, there are lots of important technical details that we’ve skipped over. Take a look at the <a href="https://cseweb.ucsd.edu/~npolikarpova/publications/osdi21.pdf">OSDI 21 paper</a> for more details or email <a href="about.html">the team</a> if you want to contribute to or use STORM!</p>
+<p>While the above should get you started, there are lots of important technical details that we’ve skipped over. Take a look at the <a href="https://ranjitjhala.github.io/static/storm-osdi21.pdf">OSDI 21 paper</a> for more details or email <a href="about.html">the team</a> if you want to contribute to or use STORM!</p>
     </div>
   </div>
 </div>

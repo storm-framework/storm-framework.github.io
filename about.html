@@ -141,7 +141,7 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="https://cseweb.ucsd.edu/~npolikarpova/publications/osdi21.pdf" target="_blank">Paper</a></li>
+                <li><a href="https://ranjitjhala.github.io/static/storm-osdi21.pdf" target="_blank">Paper</a></li>
                 <li><a href="policies.html">Policies</a></li>
                 <li><a href="use.html">Use</a></li>
                 <li><a href="http://www.github.com/storm-framework/storm"><i class="fa fa-github"></i>Code</a></li>
@@ -180,7 +180,7 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
                             <h1 class="font-style-inline-small-h1">STORM Web Framework</h1>
                             <hr class="star-primary">
                             <p class="font-style-inline-small">
-                            <li><a href="https://cseweb.ucsd.edu/~npolikarpova/publications/osdi21.pdf" target="_blank">Paper</a></li>
+                            <li><a href="https://ranjitjhala.github.io/static/storm-osdi21.pdf" target="_blank">Paper</a></li>
                             <li><a href="policies.html">Policies</a></li>
                             <li><a href="use.html">Use</a></li>
                             <li><a href="http://www.github.com/storm-framework/storm"><i class="fa fa-github"></i>Code</a></li>
@@ -228,9 +228,18 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
 <hr>
 <p>STORM is a research project described in the paper</p>
 <ul>
-<li><a href="https://cseweb.ucsd.edu/~npolikarpova/publications/osdi21.pdf">STORM: Refinement Types for Secure Web Applications</a></li>
+<li><a href="https://ranjitjhala.github.io/static/storm-osdi21.pdf">STORM: Refinement Types for Secure Web Applications</a></li>
 </ul>
 <p>that appeared at the <em>USENIX Operating System Design and Implementation (OSDI 2021)</em>.</p>
+<p>It uses two key underlying ideas</p>
+<ul>
+<li>Vazou et al’s <em>Bounded Refinement Types</em> from <a href="https://ranjitjhala.github.io/static/bounded_refinement_types.pdf">ICFP 2015</a></li>
+<li>Polikarpova et al’s <em>Liquid Information Flow Monad</em> from <a href="https://cseweb.ucsd.edu/~npolikarpova/publications/icfp20-lifty.pdf">ICFP 2020</a></li>
+</ul>
+<p>The framework itself builds upon</p>
+<ul>
+<li>The <a href="https://github.com/yesodweb/persistent">Persistent</a> API for interacting with databases</li>
+</ul>
 <h2 id="team">Team</h2>
 <p>STORM was developed by</p>
 <ul>
