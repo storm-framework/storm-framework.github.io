@@ -96,7 +96,9 @@ code {
 }
 
 pre {
-  background-color: #fffcf2;
+  /* background-color: #fffcf2; */
+  background-color: #F5F5F5;
+
   /*
      background-color: #f0f0f0;
      border-top: 1px solid #ccc;

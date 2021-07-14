@@ -74,10 +74,9 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
     <!-- StyleSheet -->
     <link rel="stylesheet" href="https://storm-framework.github.io/static/css/bootstrap.min.css">
     <!-- <link rel="stylesheet" href="https://storm-framework.github.io/static/css/spaceg.stylesheets.css"> -->
-    <link rel="stylesheet" href="https://storm-framework.github.io/static/css/ronacher.css" type="text/css">
-
-    <link rel="stylesheet" href="https://storm-framework.github.io/static/css/syntax.css">
-    <link rel="stylesheet" href="https://storm-framework.github.io/static/css/liquid-light.css">
+    <link rel="stylesheet" href="static/css/ronacher.css" type="text/css">
+    <link rel="stylesheet" href="static/css/syntax.css">
+    <link rel="stylesheet" href="static/css/liquid-light.css">
 
     <!-- Fonts
     <link href='https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
@@ -143,10 +142,10 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="https://cseweb.ucsd.edu/~npolikarpova/publications/osdi21.pdf" target="_blank">Paper</a></li>
-                <li><a href="https://storm-framework.github.io/policies.html" target="_blank">Policies</a></li>
-                <li><a href="https://storm-framework.github.io/use.html" target="_blank">Use</a></li>
-                <li><a href="http://www.github.com/storm-framework/storm" target="_blank"><i class="fa fa-github"></i>Code</a></li>
-                <li><a href="https://storm-framework.github.io/about.html" target="_blank">About</a></li>
+                <li><a href="policies.html">Policies</a></li>
+                <li><a href="use.html">Use</a></li>
+                <li><a href="http://www.github.com/storm-framework/storm"><i class="fa fa-github"></i>Code</a></li>
+                <li><a href="about.html">About</a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -182,10 +181,10 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
                             <hr class="star-primary">
                             <p class="font-style-inline-small">
                             <li><a href="https://cseweb.ucsd.edu/~npolikarpova/publications/osdi21.pdf" target="_blank">Paper</a></li>
-                            <li><a href="https://storm-framework.github.io/policies.html" target="_blank">Policies</a></li>
-                            <li><a href="https://storm-framework.github.io/use.html" target="_blank">Use</a></li>
-                            <li><a href="http://www.github.com/storm-framework/storm" target="_blank"><i class="fa fa-github"></i>Code</a></li>
-                            <li><a href="https://storm-framework.github.io/about.html" target="_blank">About</a></li>
+                            <li><a href="policies.html">Policies</a></li>
+                            <li><a href="use.html">Use</a></li>
+                            <li><a href="http://www.github.com/storm-framework/storm"><i class="fa fa-github"></i>Code</a></li>
+                            <li><a href="about.html">About</a></li>
                             </p>
                             <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
                         </div>
@@ -224,10 +223,14 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
   <div class="row">
     <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
       <p><img src="./static/img/storm-logo-2.png" /></p>
-<p><strong>STORM</strong> is a <em>Model-View-Controller</em> style framework to build web applications. The framework lets you write expressive and auditable <a href="policies.html"><em>security policies</em></a> with the data model. The policies are enforced via compile-time refinement type checking with <a href="https://ucsd-progsys.github.io/liquidhaskell-blog">LiquidHaskell</a>.</p>
+<hr>
+<p><br></p>
+<p><strong>STORM</strong> is a <em>Model-View-Controller</em> style framework to build web applications. The framework lets you write expressive and auditable <a href="policies.html">security policies</a> with the data model. The policies are enforced via compile-time refinement type checking with <a href="https://ucsd-progsys.github.io/liquidhaskell-blog">LiquidHaskell</a>.</p>
 <p><br></p>
 <hr>
+<p><br></p>
 <h2 id="step-1-specify-a-model-policy">Step 1: Specify a Model-Policy</h2>
+<p><br></p>
 <div class="row">
 <div class="col-md-6">
 <p>First, specify the data model, by naming each database <em>table</em> and its fields (columns). STORM lets you write auditable <a href="policies.html">policies</a> that govern which users can <code>insert</code> rows, or <code>read</code> or <code>update</code> fields of existing rows.</p>
@@ -237,8 +240,11 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
 <p><img id="splash-model" src="static/img/storm-policy-ifc.png"></p>
 </div>
 </div>
+<br>
 <hr>
+<p><br></p>
 <h2 id="step-2-define-a-route">Step 2: Define a Route</h2>
+<p><br></p>
 <div class="row">
 <div class="col-md-6">
 <p><img id="splash-route" src="static/img/storm-routes-1.png"></p>
@@ -248,8 +254,11 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
 For example, the <code>checklist</code> app, can have routes for authentication, to <code>add</code> a new item, and to <code>list</code> the items for the user <code>:uid</code>.</p>
 </div>
 </div>
+<br>
 <hr>
+<p><br></p>
 <h2 id="step-3-implement-a-controller">Step 3: Implement a Controller</h2>
+<p><br></p>
 <div class="row">
 <div class="col-md-4">
 <p><em>Controllers</em> handle requests for their <em>route</em> by querying the database. STORM is unimpressed: <code>selectList</code> yields all of <code>userId</code>’s items but the <em>viewer</em> can be someone else who may not view those <code>description</code>s!</p>
