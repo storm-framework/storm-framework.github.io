@@ -227,7 +227,7 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
 <h1 id="security-policies">Security Policies</h1>
 <hr>
 <p><br></p>
-<p>STORM’s policies let developers secure application data in various ways, ranging from <em>access control</em> which limits which users can insert or edit data, to <em>information flow control</em> which restricts which users can explicitly or implicitly access the values of sensitive data. Crucially, STORM policy language is very expressive, allowing specifications that depend on data values from the same row to entirely different tables.</p>
+<p>STORM’s policies let developers secure application data in various ways, ranging from <em>access control</em>: who can insert or edit data, to <em>information flow control</em>: who can explicitly or implicitly access the values of sensitive data. Crucially, STORM’s expressive policy language allows specifications that <em>depend on data</em> values from the same row to entirely different tables.</p>
 <p><br></p>
 <hr>
 <p><br></p>
@@ -236,7 +236,7 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
 <div class="row">
 <div class="col-md-6">
 <p>A <em>policy</em> is a predicate (assertion) over a database row and a user, whose truth determines when some action is allowed.</p>
-<p>Here, the <em>insert</em> policy for <code>Item</code> says that only the only the owner of the item can add the row to the DB. We can specify <em>update</em> policies for each field, that determine which users can modify the values of that field. This policy says only the owner can alter the <code>description</code> or <code>level</code>, and the <code>owner</code> never changes.</p>
+<p>Here, the <em>insert</em> policy for <code>Item</code> says that only the owner of the item can add the row to the DB. We can specify <em>update</em> policies for each field, that determine which users can modify the values of that field. This policy says only the owner can alter the <code>description</code> or <code>level</code>, and the <code>owner</code> never changes.</p>
 </div>
 <div class="col-md-6">
 <p><img src="static/img/storm-policy-access.png"></p>

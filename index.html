@@ -250,8 +250,7 @@ if (window.navigator.appName == "Microsoft Internet Explorer") {
 <p><img id="splash-route" src="static/img/storm-routes-1.png"></p>
 </div>
 <div class="col-md-6">
-<p>Next, define the <code>Routes</code> defining URLs where clients interact with the server.<br />
-For example, the <code>checklist</code> app, can have routes for authentication, to <code>add</code> a new item, and to <code>list</code> the items for the user <code>:uid</code>.</p>
+<p>Next, define the <code>Routes</code> defining URLs where clients interact with the server. For example, the <code>checklist</code> app, can have routes for authentication, to <code>add</code> a new item, and to <code>list</code> the items for the user <code>:uid</code>.</p>
 </div>
 </div>
 <br>
@@ -261,7 +260,7 @@ For example, the <code>checklist</code> app, can have routes for authentication,
 <p><br></p>
 <div class="row">
 <div class="col-md-4">
-<p><em>Controllers</em> handle requests for their <em>route</em> by querying the database. STORM is unimpressed: <code>selectList</code> yields all of <code>userId</code>’s items but the <em>viewer</em> can be someone else who may not view those <code>description</code>s!</p>
+<p>Finally, implement a <em>controller</em> to handle requests for the <em>route</em> by querying the database. STORM is unimpressed: <code>selectList</code> yields all of <code>userId</code>’s items but the <em>viewer</em> can be someone else who may not view those <code>description</code>s!</p>
 </div>
 <div class="col-md-8">
 <p><img id="splash-model" src="static/img/storm-controller-bug.png"></p>
